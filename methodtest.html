@@ -14,5 +14,194 @@
                 <a href="/methodtest.html">Method Test</a>
             </nav>
         </header>
+
+        <main>
+            <hr>
+            <form>
+                <label for="articleId">Article ID</label>
+                <input type="number" name="articleId" id="articleId">
+                <br>
+                <label for="articleName">Article Name</label>
+                <input type="text" name="articleName" id="articleName">
+                <br>
+                <label for="articleBody">Article Body</label>
+                <textarea name="articleBody" id="articleBody"></textarea>
+                <input type="hidden">
+            </form>
+            <button id="postBtn">Post</button>
+            <button id="getBtn">Get</button>
+            <button id="putBtn">Put</button>
+            <button id="deleteBtn">Delete</button>
+            <hr>
+            <output id="response"></output>
+
+            <script>
+                window.addEventListener('DOMContentLoaded',init);
+
+                function init(){
+                    document.getElementById('postBtn').addEventListener('click', postData);
+                    document.getElementById('getBtn').addEventListener('click', getData);
+                    document.getElementById('putBtn').addEventListener('click', putData);
+                    document.getElementById('deleteBtn').addEventListener('click', deleteData);
+                }
+
+                async function postData(){
+                    let data = {};
+                    let id = document.getElementById('articleId').value;
+                    let name = document.getElementById('articleName').value;
+                    let body = document.getElementById('articleBody').value;
+                    let date = new Date();
+                    if(id === ''){
+                        let text = "Did not POST, please input an ID";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    if(name === ''){
+                        let text = "Did not POST, please input an Article Name";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    if(body === ''){
+                        let text = "Did not POST, please input an Article Body";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    let curDate = date.getHours() + ":" + date.getMinutes() + " " + date.getMonth() + "/" + date.getDay() + "/" + date.getFullYear();
+                    data['id'] = id;
+                    data['Article Name'] = name;
+                    data['Article Body'] = body;
+                    data['Date'] = curDate;
+                    let response = await fetch('https://httpbin.org/post', {
+                        method: 'POST',
+                        headers: {
+                            'Host': 'httpbin.org',
+                            'Content-Type': 'application/json',
+                            'X-Sent-By': 'javascript'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if(response.ok){
+                        let responseText = await response.text();
+                        let myObj = JSON.parse(responseText);
+                        makeTable(myObj);
+                    }else{
+                        alert(`Error: ${response.status}`);
+                    }
+                }
+
+                async function getData(){
+                    let data = {};
+                    let id = document.getElementById('articleId').value;
+                    if(id === ''){
+                        let text = "Did not GET, please input an ID";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    data['id'] = id;
+                    let url = 'https://httpbin.org/get?'
+                    url += 'id=' + id;
+                    console.log(url);
+                    let response = await fetch(url, {
+                        method: 'GET',
+                    });
+
+                    if(response.ok){
+                        let responseText = await response.text();
+                        let myObj = JSON.parse(responseText);
+                        makeTable(myObj);
+                    }else{
+                        alert(`Error: ${response.status}`);
+                    }
+                }
+
+                async function putData(){
+                    let data = {};
+                    let id = document.getElementById('articleId').value;
+                    let name = document.getElementById('articleName').value;
+                    let body = document.getElementById('articleBody').value;
+                    let date = new Date();
+                    if(id === ''){
+                        let text = "Did not PUT, please input an ID";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    if(name === ''){
+                        let text = "Did not PUT, please input an Article Name";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    if(body === ''){
+                        let text = "Did not PUT, please input an Article Body";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    let curDate = date.getHours() + ":" + date.getMinutes() + " " + date.getMonth() + "/" + date.getDay() + "/" + date.getFullYear();
+                    data['id'] = id;
+                    data['Article Name'] = name;
+                    data['Article Body'] = body;
+                    data['Date'] = curDate;
+                    let response = await fetch('https://httpbin.org/put', {
+                        method: 'PUT',
+                        headers: {
+                            'Host': 'httpbin.org',
+                            'Content-Type': 'application/json',
+                            'X-Sent-By': 'javascript'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if(response.ok){
+                        let responseText = await response.text();
+                        let myObj = JSON.parse(responseText);
+                        makeTable(myObj);
+                    }else{
+                        alert(`Error: ${response.status}`);
+                    }
+                }
+
+                async function deleteData(){
+                    let data = {};
+                    let id = document.getElementById('articleId').value;
+                    if(id === ''){
+                        let text = "Did not DELETE, please input an ID";
+                        document.querySelector('output').innerHTML = text;
+                        return;
+                    }
+                    data['id'] = id;
+                    let url = 'https://httpbin.org/delete?'
+                    url += 'id=' + id;
+                    console.log(url);
+                    let response = await fetch(url, {
+                        method: 'DELETE',
+                    });
+
+                    if(response.ok){
+                        let responseText = await response.text();
+                        let myObj = JSON.parse(responseText);
+                        makeTable(myObj);
+                    }else{
+                        alert(`Error: ${response.status}`);
+                    }
+                }
+
+                function makeTable(myObj){
+                    let text = "<table border='1'>"
+                        for(let x in myObj){
+                            let output = "";
+                            if(typeof myObj[x] === 'object'){
+                                for(y in myObj[x]){
+                                    output += y + ' : ' + myObj[x][y] + "<br>";
+                                }
+                            }else{
+                                output = JSON.stringify(myObj[x]);
+                            }
+                            text += "<tr><td>" + x + "</td><td>" + output + "</td></tr>"
+                        }
+                        text += "</table>"
+                        document.querySelector('output').innerHTML = text;
+                }
+            </script>
+        </main>
     </body>
 </html>
